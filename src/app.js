@@ -1,4 +1,4 @@
-import { STATUS, items } from "./data.js";
+import { STATUS, items, moveToPrevious } from "./data.js";
 
 let currentItems = [...items];
 let nextId = Math.max(...items.map(item => item.id)) + 1;
@@ -58,6 +58,13 @@ function addItem() {
   renderItems();
 }
 
+// Function to move item to previous status
+function moveItemToPrevious(itemId) {
+  if (moveToPrevious(itemId)) {
+    renderItems();
+  }
+}
+
 // Function to update item status
 function updateItemStatus(itemId) {
   const item = currentItems.find(item => item.id === itemId);
@@ -100,23 +107,25 @@ function renderItems() {
   // Render items to appropriate containers
   currentItems.forEach(item => {
     const itemElement = document.createElement("div");
-    itemElement.style.padding = "12px 16px";
-    itemElement.style.margin = "8px 0";
-    itemElement.style.backgroundColor = "#f0ede8";
-    itemElement.style.border = "1px solid #d9d0c7";
-    itemElement.style.borderRadius = "6px";
-    itemElement.style.display = "flex";
-    itemElement.style.justifyContent = "space-between";
-    itemElement.style.alignItems = "center";
-    itemElement.style.color = "#6b5b73";
-    itemElement.style.fontSize = "14px";
-    itemElement.style.boxShadow = "0 1px 3px rgba(139, 125, 139, 0.1)";
+    itemElement.className = "item";
     
     const titleSpan = document.createElement("span");
     titleSpan.textContent = item.title;
     itemElement.appendChild(titleSpan);
     
-    // Add button if not in closure status
+    const actionsDiv = document.createElement("div");
+    actionsDiv.className = "item-actions";
+    
+    // Add "Go Back" button for items that can go back
+    if (item.status !== STATUS.NEW && item.status !== STATUS.OVERDUE) {
+      const backButton = document.createElement("button");
+      backButton.textContent = "Go Back";
+      backButton.className = "btn-back";
+      backButton.onclick = () => moveItemToPrevious(item.id);
+      actionsDiv.appendChild(backButton);
+    }
+    
+    // Add progress button if not in closure status
     const buttonText = getButtonText(item.status);
     if (buttonText) {
       const button = document.createElement("button");
@@ -130,7 +139,11 @@ function renderItems() {
       button.style.cursor = "pointer";
       button.style.fontWeight = "500";
       button.onclick = () => updateItemStatus(item.id);
-      itemElement.appendChild(button);
+      actionsDiv.appendChild(button);
+    }
+    
+    if (actionsDiv.children.length > 0) {
+      itemElement.appendChild(actionsDiv);
     }
     
     // Place item in correct container
