@@ -1,38 +1,58 @@
-import { STATUS, items, moveToPrevious } from "./data.js";
+import { STATUS, items } from "./data.js";
 
 let currentItems = [...items];
 let nextId = Math.max(...items.map(item => item.id)) + 1;
 
 // Get DOM containers
-const newContainer = document.getElementById("col-new");
-const planningContainer = document.getElementById("col-planning");
-const activeContainer = document.getElementById("col-active");
-const revisingContainer = document.getElementById("col-revising");
-const overdueContainer = document.getElementById("col-overdue");
-const closureContainer = document.getElementById("col-closure");
+const frameContainer = document.getElementById("col-frame");
+const conceptContainer = document.getElementById("col-concept");
+const prototypeContainer = document.getElementById("col-prototype");
+const marketTestContainer = document.getElementById("col-market-test");
+const commercializeContainer = document.getElementById("col-commercialize");
+const enhanceContainer = document.getElementById("col-enhance");
+const statusGrid = document.getElementById("status-grid");
 
 // Function to get next status
 function getNextStatus(currentStatus) {
   const statusFlow = {
-    [STATUS.NEW]: STATUS.PLANNING,
-    [STATUS.PLANNING]: STATUS.ACTIVE,
-    [STATUS.ACTIVE]: STATUS.REVISING,
-    [STATUS.REVISING]: STATUS.CLOSURE,
-    [STATUS.OVERDUE]: STATUS.ACTIVE,
-    [STATUS.CLOSURE]: STATUS.CLOSURE
+    [STATUS.FRAME]: STATUS.CONCEPT,
+    [STATUS.CONCEPT]: STATUS.PROTOTYPE,
+    [STATUS.PROTOTYPE]: STATUS.MARKET_TEST,
+    [STATUS.MARKET_TEST]: STATUS.COMMERCIALIZE,
+    [STATUS.COMMERCIALIZE]: STATUS.ENHANCE,
+    [STATUS.ENHANCE]: STATUS.ENHANCE
   };
   return statusFlow[currentStatus];
+}
+
+// Function to get status display name
+function getStatusDisplayName(status) {
+  const statusNames = {
+    [STATUS.FRAME]: "Frame",
+    [STATUS.CONCEPT]: "Concept",
+    [STATUS.PROTOTYPE]: "Prototype",
+    [STATUS.MARKET_TEST]: "Market Test",
+    [STATUS.COMMERCIALIZE]: "Commercialize",
+    [STATUS.ENHANCE]: "Enhance"
+  };
+  return statusNames[status];
+}
+
+// Function to get current date in YYYY-MM-DD format
+function getCurrentDate() {
+  const now = new Date();
+  return now.toISOString().split('T')[0];
 }
 
 // Function to get button text
 function getButtonText(status) {
   const buttonTexts = {
-    [STATUS.NEW]: "Plan",
-    [STATUS.PLANNING]: "Start",
-    [STATUS.ACTIVE]: "Review",
-    [STATUS.REVISING]: "Complete",
-    [STATUS.OVERDUE]: "Resume",
-    [STATUS.CLOSURE]: null
+    [STATUS.FRAME]: "Conceptualize",
+    [STATUS.CONCEPT]: "Build",
+    [STATUS.PROTOTYPE]: "Test",
+    [STATUS.MARKET_TEST]: "Launch",
+    [STATUS.COMMERCIALIZE]: "Improve",
+    [STATUS.ENHANCE]: null
   };
   return buttonTexts[status];
 }
@@ -50,7 +70,9 @@ function addItem() {
   const newItem = {
     id: nextId++,
     title: title,
-    status: STATUS.NEW
+    status: STATUS.FRAME,
+    createdAt: getCurrentDate(),
+    updatedAt: getCurrentDate()
   };
   
   currentItems.push(newItem);
@@ -58,10 +80,14 @@ function addItem() {
   renderItems();
 }
 
-// Function to move item to previous status
-function moveItemToPrevious(itemId) {
-  if (moveToPrevious(itemId)) {
-    renderItems();
+// Function to delete item
+function deleteItem(itemId) {
+  if (confirm("Are you sure you want to delete this item?")) {
+    const index = currentItems.findIndex(item => item.id === itemId);
+    if (index !== -1) {
+      currentItems.splice(index, 1);
+      renderItems();
+    }
   }
 }
 
@@ -72,6 +98,7 @@ function updateItemStatus(itemId) {
     const nextStatus = getNextStatus(item.status);
     if (nextStatus) {
       item.status = nextStatus;
+      item.updatedAt = getCurrentDate();
       renderItems();
     }
   }
@@ -80,34 +107,41 @@ function updateItemStatus(itemId) {
 // Function to render all items
 function renderItems() {
   // Clear all containers
-  newContainer.innerHTML = "";
-  planningContainer.innerHTML = "";
-  activeContainer.innerHTML = "";
-  revisingContainer.innerHTML = "";
-  overdueContainer.innerHTML = "";
-  closureContainer.innerHTML = "";
+  frameContainer.innerHTML = "";
+  conceptContainer.innerHTML = "";
+  prototypeContainer.innerHTML = "";
+  marketTestContainer.innerHTML = "";
+  commercializeContainer.innerHTML = "";
+  enhanceContainer.innerHTML = "";
   
   // Count items by status
-  const newCount = currentItems.filter(item => item.status === STATUS.NEW).length;
-  const planningCount = currentItems.filter(item => item.status === STATUS.PLANNING).length;
-  const activeCount = currentItems.filter(item => item.status === STATUS.ACTIVE).length;
-  const revisingCount = currentItems.filter(item => item.status === STATUS.REVISING).length;
-  const overdueCount = currentItems.filter(item => item.status === STATUS.OVERDUE).length;
-  const closureCount = currentItems.filter(item => item.status === STATUS.CLOSURE).length;
+  const frameCount = currentItems.filter(item => item.status === STATUS.FRAME).length;
+  const conceptCount = currentItems.filter(item => item.status === STATUS.CONCEPT).length;
+  const prototypeCount = currentItems.filter(item => item.status === STATUS.PROTOTYPE).length;
+  const marketTestCount = currentItems.filter(item => item.status === STATUS.MARKET_TEST).length;
+  const commercializeCount = currentItems.filter(item => item.status === STATUS.COMMERCIALIZE).length;
+  const enhanceCount = currentItems.filter(item => item.status === STATUS.ENHANCE).length;
   
   // Update column headers with counts
   const headers = document.querySelectorAll(".column h2");
-  headers[0].textContent = `New (${newCount})`;
-  headers[1].textContent = `Planning (${planningCount})`;
-  headers[2].textContent = `Active (${activeCount})`;
-  headers[3].textContent = `Revising (${revisingCount})`;
-  headers[4].textContent = `Overdue (${overdueCount})`;
-  headers[5].textContent = `Closure (${closureCount})`;
+  headers[0].textContent = `Frame (${frameCount})`;
+  headers[1].textContent = `Concept (${conceptCount})`;
+  headers[2].textContent = `Prototype (${prototypeCount})`;
+  headers[3].textContent = `Market Test (${marketTestCount})`;
+  headers[4].textContent = `Commercialize (${commercializeCount})`;
+  headers[5].textContent = `Enhance (${enhanceCount})`;
   
   // Render items to appropriate containers
   currentItems.forEach(item => {
     const itemElement = document.createElement("div");
     itemElement.className = "item";
+    
+    // Add "X" delete button in top-right corner
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "×";
+    deleteButton.className = "btn-delete";
+    deleteButton.onclick = () => deleteItem(item.id);
+    itemElement.appendChild(deleteButton);
     
     const titleSpan = document.createElement("span");
     titleSpan.textContent = item.title;
@@ -116,21 +150,12 @@ function renderItems() {
     const actionsDiv = document.createElement("div");
     actionsDiv.className = "item-actions";
     
-    // Add "Go Back" button for items that can go back
-    if (item.status !== STATUS.NEW && item.status !== STATUS.OVERDUE) {
-      const backButton = document.createElement("button");
-      backButton.textContent = "Go Back";
-      backButton.className = "btn-back";
-      backButton.onclick = () => moveItemToPrevious(item.id);
-      actionsDiv.appendChild(backButton);
-    }
-    
     // Add progress button if not in closure status
     const buttonText = getButtonText(item.status);
     if (buttonText) {
       const button = document.createElement("button");
       button.textContent = buttonText;
-      button.style.backgroundColor = item.status === STATUS.OVERDUE ? "#d32f2f" : "#c9a96e";
+      button.style.backgroundColor = "#c9a96e";
       button.style.color = "#ffffff";
       button.style.border = "none";
       button.style.padding = "6px 12px";
@@ -148,15 +173,48 @@ function renderItems() {
     
     // Place item in correct container
     const containers = {
-      [STATUS.NEW]: newContainer,
-      [STATUS.PLANNING]: planningContainer,
-      [STATUS.ACTIVE]: activeContainer,
-      [STATUS.REVISING]: revisingContainer,
-      [STATUS.OVERDUE]: overdueContainer,
-      [STATUS.CLOSURE]: closureContainer
+      [STATUS.FRAME]: frameContainer,
+      [STATUS.CONCEPT]: conceptContainer,
+      [STATUS.PROTOTYPE]: prototypeContainer,
+      [STATUS.MARKET_TEST]: marketTestContainer,
+      [STATUS.COMMERCIALIZE]: commercializeContainer,
+      [STATUS.ENHANCE]: enhanceContainer
     };
     
     containers[item.status].appendChild(itemElement);
+  });
+  
+  // Render project status cards
+  renderProjectStatus();
+}
+
+// Function to render project status overview
+function renderProjectStatus() {
+  statusGrid.innerHTML = "";
+  
+  currentItems.forEach(item => {
+    const card = document.createElement("div");
+    card.className = "status-card";
+    
+    const title = document.createElement("div");
+    title.className = "status-card-title";
+    title.textContent = item.title;
+    card.appendChild(title);
+    
+    const stage = document.createElement("div");
+    stage.className = "status-card-stage";
+    stage.textContent = getStatusDisplayName(item.status);
+    card.appendChild(stage);
+    
+    const dates = document.createElement("div");
+    dates.className = "status-card-dates";
+    dates.innerHTML = `
+      <div>Created: ${item.createdAt || getCurrentDate()}</div>
+      <div>Updated: ${item.updatedAt || getCurrentDate()}</div>
+    `;
+    card.appendChild(dates);
+    
+    statusGrid.appendChild(card);
   });
 }
 

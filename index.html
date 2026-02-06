@@ -10,28 +10,31 @@
         color: #6b5b73;
         margin: 0;
         padding: 20px;
+        font-size: 16px;
       }
       h1 {
         text-align: center;
         color: #8b7d8b;
         font-weight: 300;
         margin-bottom: 30px;
+        font-size: 32px;
       }
       .board {
         display: flex;
-        gap: 16px;
+        gap: 12px;
         margin: 20px auto;
-        max-width: 1400px;
-        overflow-x: auto;
+        max-width: 100%;
+        padding: 0 20px;
       }
       .column {
         flex: 1;
-        min-width: 200px;
+        min-width: 180px;
+        max-width: 200px;
         background-color: #faf9f7;
         border: 1px solid #e8e2d4;
         border-radius: 8px;
         padding: 12px;
-        min-height: 300px;
+        min-height: 400px;
         box-shadow: 0 2px 8px rgba(139, 125, 139, 0.1);
       }
       .column h2 {
@@ -40,7 +43,7 @@
         text-align: center;
         color: #8b7d8b;
         font-weight: 400;
-        font-size: 16px;
+        font-size: 14px;
         text-transform: uppercase;
         letter-spacing: 1px;
       }
@@ -54,22 +57,22 @@
         box-shadow: 0 2px 8px rgba(139, 125, 139, 0.1);
       }
       .add-content input {
-        padding: 12px 16px;
+        padding: 14px 18px;
         margin-right: 12px;
         border: 1px solid #d9d0c7;
         border-radius: 6px;
-        width: 300px;
-        font-size: 14px;
+        width: 350px;
+        font-size: 16px;
         color: #6b5b73;
       }
       .add-content button {
-        padding: 12px 20px;
+        padding: 14px 24px;
         background-color: #c9a96e;
         color: white;
         border: none;
         border-radius: 6px;
         cursor: pointer;
-        font-size: 14px;
+        font-size: 16px;
         font-weight: 500;
       }
       .add-content button:hover {
@@ -79,9 +82,29 @@
         background-color: #fff;
         border: 1px solid #e8e2d4;
         border-radius: 6px;
-        padding: 12px;
-        margin-bottom: 8px;
+        padding: 10px;
+        margin-bottom: 10px;
         box-shadow: 0 1px 3px rgba(139, 125, 139, 0.1);
+        position: relative;
+        font-size: 13px;
+      }
+      .btn-delete {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        background-color: transparent;
+        color: #666;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        line-height: 1;
+        padding: 0;
+        width: 18px;
+        height: 18px;
+      }
+      .btn-delete:hover {
+        color: #333;
       }
       .item-actions {
         display: flex;
@@ -89,18 +112,52 @@
         margin-top: 8px;
         gap: 6px;
       }
-      .btn-back {
-        padding: 4px 8px;
-        background-color: #a8a8a8;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 12px;
-        font-weight: 500;
+      .project-status {
+        margin: 40px auto;
+        max-width: 100%;
+        padding: 0 20px;
+        border-top: 2px solid #e8e2d4;
+        padding-top: 40px;
       }
-      .btn-back:hover {
-        background-color: #969696;
+      .project-status h2 {
+        text-align: center;
+        color: #8b7d8b;
+        font-weight: 400;
+        font-size: 24px;
+        margin-bottom: 20px;
+      }
+      .status-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 16px;
+      }
+      .status-card {
+        background-color: #fff;
+        border: 1px solid #e8e2d4;
+        border-radius: 8px;
+        padding: 16px;
+        box-shadow: 0 2px 8px rgba(139, 125, 139, 0.1);
+      }
+      .status-card-title {
+        font-size: 16px;
+        font-weight: 500;
+        color: #6b5b73;
+        margin-bottom: 12px;
+      }
+      .status-card-stage {
+        display: inline-block;
+        padding: 4px 12px;
+        background-color: #f0ede8;
+        border-radius: 4px;
+        font-size: 12px;
+        color: #8b7d8b;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+      }
+      .status-card-dates {
+        font-size: 13px;
+        color: #999;
+        line-height: 1.6;
       }
     </style>
   </head>
@@ -114,36 +171,41 @@
     
     <div class="board">
       <div class="column">
-        <h2>New</h2>
-        <div id="col-new"></div>
+        <h2>Frame</h2>
+        <div id="col-frame"></div>
       </div>
       
       <div class="column">
-        <h2>Planning</h2>
-        <div id="col-planning"></div>
+        <h2>Concept</h2>
+        <div id="col-concept"></div>
       </div>
       
       <div class="column">
-        <h2>Active</h2>
-        <div id="col-active"></div>
+        <h2>Prototype</h2>
+        <div id="col-prototype"></div>
       </div>
       
       <div class="column">
-        <h2>Revising</h2>
-        <div id="col-revising"></div>
+        <h2>Market Test</h2>
+        <div id="col-market-test"></div>
       </div>
       
       <div class="column">
-        <h2>Overdue</h2>
-        <div id="col-overdue"></div>
+        <h2>Commercialize</h2>
+        <div id="col-commercialize"></div>
       </div>
       
       <div class="column">
-        <h2>Closure</h2>
-        <div id="col-closure"></div>
+        <h2>Enhance</h2>
+        <div id="col-enhance"></div>
       </div>
     </div>
 
-    <script type="module" src="./src/app.js"></script>
+    <div class="project-status">
+      <h2>Project Status Overview</h2>
+      <div id="status-grid" class="status-grid"></div>
+    </div>
+
+    <script type="module" src="./src/app.js"></script></script>
   </body>
 </html>

@@ -1,34 +1,34 @@
 # A Kanban Maybe - Application Specification
 
 ## Overview
-A Kanban-style content management board with 6 workflow columns for tracking content creation lifecycle.
+A Kanban-style product development board with 6 workflow columns for tracking project lifecycle from ideation to enhancement.
 
 ## Business Rules
 
 ### Content Item Rules
-- **Creation**: New items always start in "New" column
+- **Creation**: New items always start in "Frame" column
 - **Title**: Required field, minimum 3 characters, maximum 100 characters
 - **Unique ID**: Auto-generated for each item
-- **Timestamps**: Created date and last modified date tracked
+- **Timestamps**: Created date (createdAt) and last modified date (updatedAt) tracked in YYYY-MM-DD format
+- **Status Tracking**: Current workflow stage tracked and displayed
+- **Auto-update**: updatedAt timestamp automatically updates on status change
 
 ### Workflow Transition Rules
-1. **New → Planning**: Manual move only
-2. **Planning → Active**: Manual move only
-3. **Active → Revising**: Manual move only
-4. **Active → Overdue**: Auto-move after 7 days without update
-5. **Revising → Active**: Manual move only
-6. **Revising → Closure**: Manual move only
-7. **Overdue → Active**: Manual move only
-8. **Any Column → Closure**: Manual move allowed
-9. **Closure → Previous Column**: "Go Back" function available for completed items
+1. **Frame → Concept**: Manual move only (Conceptualize button)
+2. **Concept → Prototype**: Manual move only (Build button)
+3. **Prototype → Market Test**: Manual move only (Test button)
+4. **Market Test → Commercialize**: Manual move only (Launch button)
+5. **Commercialize → Enhance**: Manual move only (Improve button)
+6. **Enhance**: Final stage, no further progression
+7. **Delete**: Items can be deleted from any column with confirmation
 
 ### Column Constraints
-- **New**: No limit on items
-- **Planning**: Maximum 5 items
-- **Active**: Maximum 3 items
-- **Revising**: No limit on items
-- **Overdue**: No limit on items
-- **Closure**: No limit on items
+- **Frame**: No limit on items
+- **Concept**: No limit on items
+- **Prototype**: No limit on items
+- **Market Test**: No limit on items
+- **Commercialize**: No limit on items
+- **Enhance**: No limit on items
 
 ## Technical Constraints
 
@@ -38,11 +38,16 @@ A Kanban-style content management board with 6 workflow columns for tracking con
 - Maximum 1000 total items
 
 ### User Interface
-- Drag and drop between columns
-- Click to edit item titles inline
-- Double-click to delete items (with confirmation)
-- "Go Back" button on completed items to return to previous column
+- "Delete" button (X icon) on all items to remove them (with confirmation)
 - Responsive design for mobile and desktop
+- Project Status Overview section below Kanban board displaying all project cards
+- Status-specific action buttons for workflow progression
+
+### Project Status Display
+- Overview cards section positioned below the main Kanban board
+- Each card displays: project title, current stage, created date, last modified date
+- Cards arranged in grid layout
+- Real-time synchronization with Kanban board changes
 
 ### Performance
 - Render maximum 50 items per column
@@ -57,9 +62,9 @@ A Kanban-style content management board with 6 workflow columns for tracking con
 - Special characters allowed: letters, numbers, spaces, hyphens, underscores
 
 ### State Validation
-- Cannot move items to invalid columns based on workflow rules
-- Cannot exceed column item limits
-- Cannot delete items in "Active" status without confirmation
+- Items follow sequential workflow progression
+- Deletion requires user confirmation
+- Timestamps automatically validated and updated
 
 ## Error Handling
 - Display user-friendly error messages
